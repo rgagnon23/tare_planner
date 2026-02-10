@@ -75,6 +75,7 @@ private:
   // Parameters
   // String
   std::string sub_start_exploration_topic_;
+  std::string sub_stop_exploration_topic_;
   std::string sub_keypose_topic_;
   std::string sub_state_estimation_topic_;
   std::string sub_registered_scan_topic_;
@@ -183,6 +184,7 @@ private:
   bool lookahead_point_update_;
   bool relocation_;
   bool start_exploration_;
+  bool stop_exploration_;
   bool exploration_finished_;
   bool near_home_;
   bool at_home_;
@@ -215,6 +217,7 @@ private:
 
   // ROS subscribers
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr exploration_start_sub_;
+  rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr exploration_stop_sub_;
   rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr
       registered_scan_sub_;
   rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr
@@ -257,6 +260,8 @@ private:
   // Callback functions
   void
   ExplorationStartCallback(const std_msgs::msg::Bool::ConstSharedPtr start_msg);
+  void
+  ExplorationStopCallback(const std_msgs::msg::Bool::ConstSharedPtr stop_msg);
   void StateEstimationCallback(
       const nav_msgs::msg::Odometry::ConstSharedPtr state_estimation_msg);
   void RegisteredScanCallback(

@@ -26,6 +26,10 @@ namespace sensor_coverage_planner_3d_ns {
 void SensorCoveragePlanner3D::ReadParameters() {
   this->declare_parameter<std::string>("sub_start_exploration_topic_",
                                        "/exploration_start");
+
+  this->declare_parameter<std::string>("sub_stop_exploration_topic_",
+                                       "/exploration_stop");
+
   this->declare_parameter<std::string>("sub_state_estimation_topic_",
                                        "/state_estimation_at_scan");
   this->declare_parameter<std::string>("sub_registered_scan_topic_",
@@ -177,12 +181,23 @@ void SensorCoveragePlanner3D::ReadParameters() {
   this->declare_parameter<double>("kLocalPlanningHorizonHeight", 3.0);
 
   bool got_parameter = true;
+  
   got_parameter &= this->get_parameter("sub_start_exploration_topic_",
                                        sub_start_exploration_topic_);
+
   if (!got_parameter) {
     std::cout << "Failed to get parameter sub_start_exploration_topic_"
               << std::endl;
   }
+
+  got_parameter &= this->get_parameter("sub_stop_exploration_topic_",
+                                       sub_stop_exploration_topic_);
+
+  if (!got_parameter) {
+    std::cout << "Failed to get parameter sub_stop_exploration_topic_"
+              << std::endl;
+  }
+
   this->get_parameter("sub_state_estimation_topic_",
                       sub_state_estimation_topic_);
   this->get_parameter("sub_registered_scan_topic_", sub_registered_scan_topic_);
@@ -359,7 +374,7 @@ void SensorCoveragePlanner3D::InitializeData() {
 SensorCoveragePlanner3D::SensorCoveragePlanner3D()
     : Node("tare_planner_node"), keypose_cloud_update_(false),
       initialized_(false), lookahead_point_update_(false), relocation_(false),
-      start_exploration_(false), exploration_finished_(false),
+      start_exploration_(false),stop_exploration_(false), exploration_finished_(false),
       near_home_(false), at_home_(false), stopped_(false),
       test_point_update_(false), viewpoint_ind_update_(false), step_(false),
       use_momentum_(false), lookahead_point_in_line_of_sight_(true),
@@ -392,6 +407,12 @@ bool SensorCoveragePlanner3D::initialize() {
       sub_start_exploration_topic_, 5,
       std::bind(&SensorCoveragePlanner3D::ExplorationStartCallback, this,
                 std::placeholders::_1));
+
+  exploration_stop_sub_ = this->create_subscription<std_msgs::msg::Bool>(
+      sub_stop_exploration_topic_, 5,
+      std::bind(&SensorCoveragePlanner3D::ExplorationStopCallback, this,
+                std::placeholders::_1));
+
   registered_scan_sub_ =
       this->create_subscription<sensor_msgs::msg::PointCloud2>(
           sub_registered_scan_topic_, 5,
@@ -471,6 +492,15 @@ void SensorCoveragePlanner3D::ExplorationStartCallback(
     const std_msgs::msg::Bool::ConstSharedPtr start_msg) {
   if (start_msg->data) {
     start_exploration_ = true;
+    stop_exploration_ = false;
+  }
+}
+
+void SensorCoveragePlanner3D::ExplorationStopCallback(
+    const std_msgs::msg::Bool::ConstSharedPtr stop_msg) {
+  if (stop_msg->data) {
+    start_exploration_ = false;
+    stop_exploration_ = true;
   }
 }
 
@@ -1460,6 +1490,13 @@ void SensorCoveragePlanner3D::execute() {
     RCLCPP_INFO(this->get_logger(), "Waiting for start signal");
     return;
   }
+
+  if (stop_exploration_) {
+        // If paused, skip this iteration to freeze the planner
+        RCLCPP_INFO(this->get_logger(), "Autonomous Mode Stopped");
+        return;
+  }
+
   Timer overall_processing_timer("overall processing");
   update_representation_runtime_ = 0;
   local_viewpoint_sampling_runtime_ = 0;
