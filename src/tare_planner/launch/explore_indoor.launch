@@ -20,7 +20,7 @@ def generate_launch_description():
 
     use_boundary_arg = DeclareLaunchArgument(
         'use_boundary',
-        default_value='false',
+        default_value='true',
         description='Use boundary for navigation')
 
     explore_launch = IncludeLaunchDescription(
@@ -28,7 +28,7 @@ def generate_launch_description():
             [get_package_share_directory('tare_planner'), '/explore.launch']),
         launch_arguments={
             'use_sim_time': LaunchConfiguration('use_sim_time'),
-            'scenario': 'indoor',
+            'scenario': 'spot',
             'rviz': LaunchConfiguration('rviz')
         }.items())
 

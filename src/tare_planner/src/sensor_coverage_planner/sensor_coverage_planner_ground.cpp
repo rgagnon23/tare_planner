@@ -998,7 +998,7 @@ void SensorCoveragePlanner3D::PublishLocalPlanningVisualization(
   nav_msgs::msg::Path local_tsp_path = local_path.GetPath();
   local_tsp_path.header.frame_id = "map";
   local_tsp_path.header.stamp = this->now();
-  local_tsp_path_publisher_->publish(local_tsp_path);
+  // local_tsp_path_publisher_->publish(local_tsp_path);
   local_coverage_planner_->GetSelectedViewPointVisCloud(
       selected_viewpoint_vis_cloud_->cloud_);
   selected_viewpoint_vis_cloud_->Publish();

@@ -20,7 +20,7 @@ tare_planner_node:
     kRushHome : true
     kUseTerrainHeight : false
     kCheckTerrainCollision : true
-    kExtendWayPoint : true
+    kExtendWayPoint : false
     kUseLineOfSightLookAheadPoint : true
     kNoExplorationReturnHome : true
     kExtendWayPointDistanceBig : 8.0
@@ -33,7 +33,7 @@ tare_planner_node:
     kUseMomentum : true 
     kDirectionChangeCounterThr : 6
     kDirectionNoChangeCounterThr : 5
-    kResetWaypointJoystickAxesID : 2
+    kResetWaypointJoystickButton : 0
 
     # PlanningEnv
     kUseFrontier : true

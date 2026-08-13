@@ -20,7 +20,7 @@ tare_planner_node:
     kRushHome : true
     kUseTerrainHeight : false
     kCheckTerrainCollision : true
-    kExtendWayPoint : true
+    kExtendWayPoint : false
     kUseLineOfSightLookAheadPoint : true
     kNoExplorationReturnHome : true
     kExtendWayPointDistanceBig : 4.0
@@ -80,6 +80,7 @@ tare_planner_node:
     viewpoint_manager/resolution_z : 0.0
     kConnectivityHeightDiffThr : 0.25
     kGreedyViewPointSampleRange : 3
+
     kLocalPathOptimizationItrMax : 10
     kViewPointCollisionMargin : 0.1
     kViewPointCollisionMarginZPlus : 0.25
@@ -109,6 +110,7 @@ tare_planner_node:
     kMinAddPointNumSmall : 8
     kMinAddPointNumBig : 16
     kMinAddFrontierPointNum : 8
+    
     kCellExploringToCoveredThr : 1
     kCellCoveredToExploringThr: 10
     kCellExploringToAlmostCoveredThr: 10

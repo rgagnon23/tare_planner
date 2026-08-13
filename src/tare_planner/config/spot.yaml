@@ -1,0 +1,144 @@
+tare_planner_node:
+  ros__parameters:
+    sub_start_exploration_topic_ : /start_exploration
+    sub_state_estimation_topic_ : /state_estimation_at_scan
+    sub_registered_scan_topic_ : /registered_scan
+    sub_coverage_boundary_topic_ : /sensor_coverage_planner/coverage_boundary
+    sub_viewpoint_boundary_topic_ : /navigation_boundary
+    sub_nogo_boundary_topic_ : /sensor_coverage_planner/nogo_boundary
+    sub_joystick_topic_ : /joy
+    sub_reset_waypoint_topic_ : /reset_waypoint
+    pub_exploration_finish_topic_ : exploration_finish
+    pub_runtime_breakdown_topic_ : runtime_breakdown
+    pub_runtime_topic_ : /runtime
+    pub_waypoint_topic_ : /way_point
+    pub_momentum_activation_count_topic_ : momentum_activation_count
+
+    kAutoStart : true
+    kRushHome : true
+    kUseTerrainHeight : false
+    kCheckTerrainCollision : true
+    kExtendWayPoint : false #have the waypoint extend off th local plan
+    kUseLineOfSightLookAheadPoint : true #unsure
+    kNoExplorationReturnHome : true
+    kExtendWayPointDistanceBig : 8.0 #the min and max placement of the waypoint is extended
+    kExtendWayPointDistanceSmall : 3.0
+    kDirectionChangeCounterThr : 6
+    kDirectionNoChangeCounterThr : 5
+    kResetWaypointJoystickAxesID : 2
+
+    # PlanningEnv
+    kUseFrontier : true #i am unsure
+    kUseCoverageBoundaryOnObjectSurface : false
+
+    # Rolling occupancy grid - effects the frontier
+    #if too small waypoint in wall hmmm and very slow no benefits, didnt notice cons making it bigger
+    kKeyposeCloudStackNum : 5
+    kPointCloudRowNum : 50
+    kPointCloudColNum : 50 #didnt notice anything
+    kPointCloudLevelNum : 30 #no change
+    kMaxCellPointNum : 100000 #no change
+    kPointCloudCellSize : 18.0 #dont really notice a difference , only make it break if too big or small (50-5)
+    kPointCloudCellHeight : 1.8 #if its too high slows down but still works
+    kPointCloudManagerNeighborCellNum : 5 #too high 10 and too small 1 causes it to not work at all but dont see performance different
+    kCoverCloudZSqueezeRatio : 2.0 #waypoint moves before reaching it, might terminates exploration quickly if too big(jk im not sure)
+
+
+    # ViewPointManager
+    viewpoint_manager/resolution_z : 0.0
+    kConnectivityHeightDiffThr : 0.25 #no change
+    kGreedyViewPointSampleRange : 3 #too small breaks it 
+    kLocalPathOptimizationItrMax : 10 #no change big or small   
+    kViewPointCollisionMarginZPlus : 0.3 #no affect will probably effect similarly if there is a ceiling (none in simulation)
+    kViewPointCollisionMarginZMinus : 0.5 #no affect really (so not ground i assume)
+
+    #This is what affects closeness to walls and stuff, although if there are too few (too big) they do not place. Too little terminate exploration quickly
+    kViewPointCollisionMargin : 0.6 #effects the placement of yellow viewpoints, too big they are placed very far and sparse and too small too many are placed. 
+    kCollisionGridZScale : 1.0 #terminated exploration quickly if too big, no affect
+    kCollisionGridResolutionZ : 0.0
+    kCollisionPointThr : 1 #too big might not find viewpoints, gets confused during path planing when 0?
+    kViewPointHeightFromTerrain : 0.75 #did change much
+    kViewPointHeightFromTerrainChangeThreshold : 0.6 #didnt change much
+    kCheckDynamicObstacleCollision : false #check dynamic obstacles
+    kCollisionFrameCountMax : 3 #nothing noticeable
+
+
+    # Grid World - does not affect viewpoint performance, this might be global
+    kGridWorldXNum : 121 #slow if too big, doesnt really help performance
+    kGridWorldYNum : 121 #too small didnt do a lot for views
+    kGridWorldZNum : 121
+    kGridWorldCellHeight : 3.0
+    kGridWorldNearbyGridNum : 5
+    kCellExploringToCoveredThr : 1 #no affect
+    kCellCoveredToExploringThr: 10 #create a lot or orange points at corners?
+    kCellExploringToAlmostCoveredThr: 10
+    kCellAlmostCoveredToExploringThr: 20
+    kCellUnknownToExploringThr: 1 #created bad waypoints at 0
+
+    # Visualization
+    kExploringSubspaceMarkerColorGradientAlpha : true
+    kExploringSubspaceMarkerColorMaxAlpha : 0.8
+    kExploringSubspaceMarkerColorR : 0.0
+    kExploringSubspaceMarkerColorG : 1.0
+    kExploringSubspaceMarkerColorB : 0.0
+    kExploringSubspaceMarkerColorA : 1.0
+    kLocalPlanningHorizonMarkerColorR : 0.0
+    kLocalPlanningHorizonMarkerColorG : 1.0
+    kLocalPlanningHorizonMarkerColorB : 0.0
+    kLocalPlanningHorizonMarkerColorA : 1.0
+    kLocalPlanningHorizonMarkerWidth : 0.3
+    kLocalPlanningHorizonHeight : 3.0
+
+    #Varying Params
+
+    kKeyposeCloudDwzFilterLeafSize : 0.2 #affects speed and whether points are dropped - important?
+    kRushHomeDist : 5.0
+    kAtHomeDistThreshold : 0.5
+    kTerrainCollisionThreshold : 0.5 #collision threshols, nodes and waypoint still placed - affects the path planning, doesnt really affect collisions, kind of helps not really
+    kLookAheadDistance : 8.0 #effects way point placement (max)
+    kUseMomentum : true 
+
+    #Grid World
+    kMinAddPointNumSmall : 40 #same really no change for viewpoints
+    kMinAddPointNumBig : 60
+    kMinAddFrontierPointNum : 8 #If this is too high, exploratin goes to first waypoint and terminated immediately
+
+    kSensorRange : 7.5 #didnt really notice a big change if too small, still places yellow dots to green box 
+    kNeighborRange : 3.0 #effects orange dots, places further apart if bigger and more closer, bit slower and shorter watpoints
+    kCoverageOcclusionThr : 0.3 #not to much change, places more outside walls
+    kCoverageDilationRadius : 0.5 #places a lot outside walls, think it needs a balance with other params
+
+    kCollisionGridResolutionX : 0.2 #if too big it will not detect obstacles and place waypoint out of reach
+    kCollisionGridResolutionY : 0.2 #if too small will be slow, will still place outside room
+
+    # ViewPointManager
+    viewpoint_manager/number_x : 70 #effects the size of the green box, how many yellow points
+    viewpoint_manager/number_y : 70 #too small affects if exploration terminates quickly, too big creates a lot of points outside walls
+    viewpoint_manager/number_z : 1
+    viewpoint_manager/resolution_x : 0.3 #also affects the size of the green box, really struggles if points are close together
+    viewpoint_manager/resolution_y : 0.3 # it is the distances between each of the yellow points, too small it will be place outside walls
+
+    # KeyposeGraph
+    keypose_graph/kAddNodeMinDist : 1.0 #no change really
+    keypose_graph/kAddNonKeyposeNodeMinDist : 0.5 #no change
+    keypose_graph/kAddEdgeConnectDistThr : 3.0 #no change
+    keypose_graph/kAddEdgeToLastKeyposeDistThr : 3.0
+    keypose_graph/kAddEdgeVerticalThreshold : 1.0
+    keypose_graph/kAddEdgeCollisionCheckResolution : 0.4
+    keypose_graph/kAddEdgeCollisionCheckRadius : 0.4
+    keypose_graph/kAddEdgeCollisionCheckPointNumThr : 1
+
+    kLineOfSightStopAtNearestObstacle : false #this seems to stop viewpoints from being placed outside of walls and past a sensor scan
+
+    #rolling occupancy grid
+    rolling_occupancy_grid/resolution_x : 0.3
+    rolling_occupancy_grid/resolution_y : 0.3
+    rolling_occupancy_grid/resolution_z : 0.3
+
+    kSurfaceCloudDwzLeafSize : 0.8 #didnt notice anything making in bigger/smaller
+    kCollisionCloudDwzLeafSize : 0.2 #didnt notice anything maing it huge
+
+    #Planning Env
+    kFrontierClusterTolerance : 0.5
+    kFrontierClusterMinSize : 5
+    kUseCoverageBoundaryOnFrontier : false 
